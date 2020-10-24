@@ -7,7 +7,7 @@ export class AppController {
 
   @Get('/getJobs')
   getJobs() {
-    return this.appService.getWorkerJobs();
+    return this.appService.getWorkerJobs( );
   }
 
   @Post('/getError')
