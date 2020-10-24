@@ -30,4 +30,13 @@ export class UsersService {
   getAll(){
     return this.usersRepository.find()
   }
+
+  /*updateUsersJobs(user, job){
+    if (!user.jobs){
+      user.jobs = []
+    }
+    user.jobs.push(job)
+    console.log(user)
+    return this.usersRepository.save(user)
+  }*/
 }

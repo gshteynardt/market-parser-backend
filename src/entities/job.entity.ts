@@ -9,9 +9,6 @@ export class Job {
   @Column({unique: true})
   jobUUID: string;
 
-  @Column("boolean", {default: false})
-  isFinished: boolean;
-
   @ManyToOne(type=> User, user => user.id, {cascade: true})
   @JoinColumn()
   author: User
