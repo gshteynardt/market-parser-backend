@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from './user.entity';
 
 @Entity()
@@ -12,6 +12,7 @@ export class Job {
   @Column("boolean", {default: false})
   isFinished: boolean;
 
-  @OneToOne(type=> User, user => user.jobs, {cascade: true})
+  @ManyToOne(type=> User, user => user.id, {cascade: true})
+  @JoinColumn()
   author: User
 }
