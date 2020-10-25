@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsersService } from './users.service';
 import { map } from 'rxjs/operators';
+import { User } from '../entities/user.entity';
 const fs = require("fs");
 
 @Injectable()
@@ -22,18 +23,17 @@ export class JobsService {
     return await this.jobsRepository.findOne({id: id})
   }
 
-  /*async addJob(){
-    const user = await this.userService.getUserById(3)
+  async addJob(){
+    const user = await this.userService.getUserById(4)
     const job = this.jobsRepository.create({
-      jobUUID: '1603115662214_0x33946741255392743',
-      isFinished: true,
+      jobUUID: '1603115662214_0x33946741255392743test2',
       author: user
     })
     return this.jobsRepository.save(job)
-      .then(/!*()=>{
+      .then(/*()=>{
         this.userService.updateUsersJobs(user, job)
-      }*!/)
-  }*/
+      }*/)
+  }
 
   csvToArray(text) {
     let p = '', row = [''], ret = [row], i = 0, r = 0, s = !0, l;
@@ -51,25 +51,34 @@ export class JobsService {
     return ret;
   };
 
-  async getJobResult(id) {
+  async getJobStatus(id: number){
     const job: Job = await this.getJobByJobId(id);
-      return this.httpService.get(`http://159.89.51.65:8080/workers/defaultWorker/jobs/${job.jobUUID}`, {
-        headers: {
-          'Authorization': 'Basic dXV1OmdnZzEyMw=='
-        }
-      }).toPromise()
-        .then(res => {
-          if (res.data.status === "finished"){
-          return this.httpService.get(`http://159.89.51.65:8080/${res.data.builtOutputFilePath}`, {
-            headers: {
-              'Authorization': 'Basic dXV1OmdnZzEyMw=='
-            }
-          }).pipe(map(res => {
-            fs.writeFile(`./data/${job.jobUUID}.csv`, res.data, (res)=>{})
-            return { data: this.csvToArray(res.data) }
-          }))}
-          else return {status: 'Job in progress'}
-        })
+    return this.httpService.get(`http://159.89.51.65:8080/workers/defaultWorker/jobs/${job.jobUUID}`, {
+      headers: {
+        'Authorization': 'Basic dXV1OmdnZzEyMw=='
+      }
+    }).pipe(map(res=>res.data))
+  }
+
+  async getJobResult(id: number) {
+    const job: Job = await this.getJobByJobId(id);
+    return this.httpService.get(`http://159.89.51.65:8080/workers/defaultWorker/jobs/${job.jobUUID}`, {
+      headers: {
+        'Authorization': 'Basic dXV1OmdnZzEyMw=='
+      }
+    }).toPromise()
+      .then(res => {
+        if (res.data.status === "finished"){
+        return this.httpService.get(`http://159.89.51.65:8080/${res.data.builtOutputFilePath}`, {
+          headers: {
+            'Authorization': 'Basic dXV1OmdnZzEyMw=='
+          }
+        }).pipe(map(res => {
+          fs.writeFile(`./data/${job.jobUUID}.csv`, res.data, (res)=>{})
+          return { data: this.csvToArray(res.data) }
+        }))}
+        else return {status: 'Job in progress'}
+      })
 
   }
 
@@ -83,5 +92,21 @@ export class JobsService {
       return {message: "Couldn't find/read the requested file."}
     }
     return {data: this.csvToArray(fileData)}
+  }
+
+  async deleteJob(id: number){
+    const job: Job = await this.getJobByJobId(id);
+    if (job){
+      await this.jobsRepository.delete(job)
+        .then(res=>res)
+        .catch(err=>err)
+    }
+    else return {message: 'Job not found'}
+  }
+
+  async getAllJobs(){
+    const currentUser: User = await this.userService.getUserById(3);
+    const jobsArray: Job[] = await this.jobsRepository.find({author: currentUser});
+    return {jobs: jobsArray}
   }
 }

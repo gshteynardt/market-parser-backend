@@ -9,6 +9,9 @@ export class Job {
   @Column({unique: true})
   jobUUID: string;
 
+  /*@Column()
+  createdAt: string;*/
+
   @ManyToOne(type=> User, user => user.id, {cascade: true})
   @JoinColumn()
   author: User

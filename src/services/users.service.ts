@@ -16,7 +16,7 @@ export class UsersService {
     const user = this.usersRepository.create({
       firstName: 'testName',
       lastName: 'testSurname',
-      email: 'test@gmail.com',
+      email: 'test2@gmail.com',
       password: 'password',
       jobs: []
     })
