@@ -5,11 +5,6 @@ import { AppService } from '../services/app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get('/getJobs')
-  getJobs() {
-    return this.appService.getWorkerJobs();
-  }
-
   @Post('/getError')
   sendError(): string{
     return 'Error'

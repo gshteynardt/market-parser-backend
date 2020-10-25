@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToMany } from 'typeorm';
 import { Job } from './job.entity';
 
 @Entity()
@@ -18,7 +18,6 @@ export class User {
   @Column({length: 20})
   password: string;
 
-  @OneToOne(type => Job, job=> job.author)
-  @JoinColumn()
+  @OneToMany(type => Job, job=> job.jobUUID, {cascade: true, nullable: true})
   jobs: Job[];
 }
