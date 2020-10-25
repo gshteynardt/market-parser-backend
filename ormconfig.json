@@ -6,7 +6,7 @@
   "password": "root",
   "database": "PriceParser",
   "entities": ["User", "Job"],
-  "synchronize": true,
+  "synchronize": false,
   "retryAttempts": 20,
   "retryDelay": 2000
 }

@@ -3,8 +3,8 @@ import { AppController } from '../controllers/app.controller';
 import { AppService } from '../services/app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JobsModule } from './jobs.module';
-import { UsersModule } from './users.module';
-import { User } from '../entities/user.entity';
+import { UsersModule } from '../users/users.module';
+import { User } from '../users/user.entity';
 import { Job } from '../entities/job.entity';
 
 @Module({
@@ -20,10 +20,10 @@ import { Job } from '../entities/job.entity';
       "password": "root",
       "database": "PriceParser",
       "entities": [User, Job],
-      "synchronize": true,
+      "synchronize": false,
       "retryAttempts": 20,
       "retryDelay": 2000,
-      "autoLoadEntities": true
+      //"autoLoadEntities": true
     }
   ), UsersModule, JobsModule],
   controllers: [AppController],

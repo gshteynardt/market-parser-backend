@@ -2,7 +2,7 @@ import { HttpService, Injectable } from '@nestjs/common';
 import { Job } from '../entities/job.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UsersService } from './users.service';
+import { UsersService } from '../users/users.service';
 import { map } from 'rxjs/operators';
 const fs = require("fs");
 

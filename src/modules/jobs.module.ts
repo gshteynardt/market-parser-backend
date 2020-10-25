@@ -3,8 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Job } from '../entities/job.entity';
 import { JobsService } from '../services/jobs.service';
 import { JobsController } from '../controllers/jobs.controller';
-import { UsersService } from '../services/users.service';
-import { User } from '../entities/user.entity';
+import { UsersService } from '../users/users.service';
+import { User } from '../users/user.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Job]), TypeOrmModule.forFeature([User]), HttpModule.register({
