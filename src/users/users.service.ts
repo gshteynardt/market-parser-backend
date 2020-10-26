@@ -41,11 +41,16 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  async findOne(id: string): Promise<User> {
+  async findOneById(id: string): Promise<User> {
     return this.usersRepository.findOne(id);
   }
+
+    async findOne(email: string): Promise<User | undefined> {
+        return this.usersRepository.findOne({email});
+    }
 
   async remove(id: string): Promise<void> {
     await this.usersRepository.delete(id);
   }
+
 }

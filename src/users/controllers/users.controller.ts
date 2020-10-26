@@ -1,7 +1,7 @@
 import {  Controller, Delete, Get, Param, Post, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { User } from './user.entity';
-import { UsersService } from './users.service';
+import { User } from '../user.entity';
+import { UsersService } from '../users.service';
 
 @Controller('users')
 export class UsersController {
@@ -17,9 +17,14 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string): Promise<User> {
-    return this.usersService.findOne(id);
+  // @Get(':id')
+  // findOne(@Param('id') id: string): Promise<User> {
+  //   return this.usersService.findOneById(id);
+  // }
+
+  @Get(':email')
+  find(@Param('email') email: string): Promise<User> {
+    return this.usersService.findOne(email);
   }
 
   @Delete(':id')
