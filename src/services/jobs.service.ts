@@ -26,8 +26,10 @@ export class JobsService {
   async addJob(){
     const user = await this.userService.getUserById(4)
     const job = this.jobsRepository.create({
-      jobUUID: '1603115662214_0x33946741255392743test2',
-      author: user
+      jobUUID: '1603115662214_0x33946741255392743',
+      author: user,
+      createdAt: (new Date).getTime(),
+      title: 'Default Title'
     })
     return this.jobsRepository.save(job)
       .then(/*()=>{
@@ -53,11 +55,16 @@ export class JobsService {
 
   async getJobStatus(id: number){
     const job: Job = await this.getJobByJobId(id);
+    if (job.jobUUID!=='unset'){
     return this.httpService.get(`http://159.89.51.65:8080/workers/defaultWorker/jobs/${job.jobUUID}`, {
       headers: {
         'Authorization': 'Basic dXV1OmdnZzEyMw=='
       }
-    }).pipe(map(res=>res.data))
+    }).pipe(map(res=>{
+      return {id: job.id, entriesProcessed: res.data.entriesProcessed,
+        launched: res.data.createdAt, status: res.data.status, created: job.createdAt, title: job.title}
+    }))}
+    else return {id: job.id, launched: 0, created: job.createdAt, title: job.title}
   }
 
   async getJobResult(id: number) {
@@ -105,8 +112,18 @@ export class JobsService {
   }
 
   async getAllJobs(){
-    const currentUser: User = await this.userService.getUserById(3);
+    const currentUser: User = await this.userService.getUserById(4);
     const jobsArray: Job[] = await this.jobsRepository.find({author: currentUser});
-    return {jobs: jobsArray}
+    const result: {id: number, entriesProcessed: number, launched: number, status: string, created: number, title: string}[] = [];
+    for (const elem of jobsArray){
+      await this.httpService.get(`http://159.89.51.65:8080/workers/defaultWorker/jobs/${elem.jobUUID}`, {
+        headers: {
+          'Authorization': 'Basic dXV1OmdnZzEyMw=='
+        }
+      }).toPromise().then(res=>{
+        result.push({id: elem.id, title: elem.title, entriesProcessed: res.data.entriesProcessed, created: elem.createdAt, launched: res.data.createdAt, status: res.data.status})
+      })
+    }
+    return {jobs: result}
   }
 }

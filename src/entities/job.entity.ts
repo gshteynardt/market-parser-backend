@@ -3,14 +3,18 @@ import { User } from './user.entity';
 
 @Entity()
 export class Job {
+
+  @Column()
+  title: string;
+
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({unique: true})
+  @Column({unique: true, default: 'unset'})
   jobUUID: string;
 
-  /*@Column()
-  createdAt: string;*/
+  @Column('bigint')
+  createdAt: number;
 
   @ManyToOne(type=> User, user => user.id, {cascade: true})
   @JoinColumn()
