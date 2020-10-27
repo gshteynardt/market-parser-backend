@@ -9,19 +9,14 @@ export class AuthService {
 
     async validateUser(email: string, pass: string): Promise<any> {
 
-        await this.usersService.findOne(email)
-            .then( user => {
-                if (!user) {
-                    return Promise.reject(new Error('Неправильные почта и пароль'))
-                }
-                bcrypt.compare(pass, user.password)
-                    .then( matched => {
-                        if (!matched) {
-                            return Promise.reject(new Error('Неправильные почта и пароль'))
-                        }
-                        return user;
-                    })
-                return null;
-            })
+      const user = await this.usersService.findOne(email);
+      if (!user) {
+        return null;
+      }
+      const result = await bcrypt.compare(pass, user.password);
+      if (result) {
+        return user;
+      }
+      return null;
     }
 }

@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
+import { validate } from 'class-validator';
+import { HttpException } from '@nestjs/common/exceptions/http.exception';
 
 @Injectable()
 export class UsersService {
@@ -10,32 +12,30 @@ export class UsersService {
       private readonly usersRepository: Repository<User>,
   ) {}
 
-  async createUser(body, response): Promise<void>{
-    const {nickname, firstName, lastName, email, password} = body;
-    const bcrypt = require('bcrypt');
-    const saltRounds = 10;
-    bcrypt.hash(password, saltRounds)
-        .then(hash => {
-          const user = this.usersRepository.create({
-            nickName: nickname,
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-            password: hash,
-          })
-          return user;
-        })
-        .then( user => {
-          this.usersRepository.save(user)
-              .then(user => response.send(user))
-              .catch(err => response.status(400).send(err.message));
-            }
-        )
-        .catch(err => {
-          response.status(500)
-          console.log(err)
-        })
-  }
+    async createUser(user: User) {
+
+        // Проверка, что пользователь с такой почтой не существует
+        const {email} = user;
+        const query_user = await this.findOne(email);
+        if (query_user) {
+            const errors = {username: 'email must be unique.'};
+            throw new HttpException({message: 'Input data validation failed', errors}, HttpStatus.BAD_REQUEST);
+        }
+
+        const newUser = new User();
+        newUser.full_name = user.full_name;
+        newUser.email = user.email;
+        newUser.password = user.password;
+        const errors = await validate(newUser);
+        if (errors.length > 0) {
+            // Таким образом возвращается ошибку, если email не подходит под "шаблон"
+            const _errors = {username: 'fields are invalid'};
+            throw new HttpException({message: 'Input data validation failed', _errors}, HttpStatus.BAD_REQUEST);
+        } else {
+            const savedUser = await this.usersRepository.save(newUser);
+            return savedUser;
+        }
+    }
 
   async findAll(): Promise<User[]> {
     return this.usersRepository.find();
@@ -45,9 +45,9 @@ export class UsersService {
     return this.usersRepository.findOne(id);
   }
 
-    async findOne(email: string): Promise<User | undefined> {
-        return this.usersRepository.findOne({email});
-    }
+  async findOne(email: string): Promise<User | undefined> {
+    return this.usersRepository.findOne({email});
+  }
 
   async remove(id: string): Promise<void> {
     await this.usersRepository.delete(id);
