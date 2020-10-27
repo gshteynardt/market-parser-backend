@@ -5,7 +5,16 @@ import { Repository } from 'typeorm';
 import { UsersService } from './users.service';
 import { map } from 'rxjs/operators';
 import { User } from '../entities/user.entity';
-const fs = require("fs");
+const fs = require('fs');
+
+export interface IJobData {
+  id: number;
+  entriesProcessed?: number;
+  launched?: number;
+  status?: string;
+  created: number;
+  title: string;
+}
 
 @Injectable()
 export class JobsService {
@@ -13,117 +22,160 @@ export class JobsService {
     @InjectRepository(Job)
     private jobsRepository: Repository<Job>,
     private userService: UsersService,
-    private httpService: HttpService) {}
+    private httpService: HttpService,
+  ) {}
 
-  async getJobByJobUUID(uuid: string){
-    return await this.jobsRepository.findOne({jobUUID: uuid})
+  async getJobByJobUUID(uuid: string) {
+    return await this.jobsRepository.findOne({ jobUUID: uuid });
   }
 
-  async getJobByJobId(id: number){
-    return await this.jobsRepository.findOne({id: id})
+  async getJobByJobId(id: number) {
+    return await this.jobsRepository.findOne({ id: id });
   }
 
-  async addJob(){
-    const user = await this.userService.getUserById(4)
+  async addJob() {
+    const user = await this.userService.getUserById(4);
     const job = this.jobsRepository.create({
-      jobUUID: '1603115662214_0x33946741255392743',
       author: user,
-      createdAt: (new Date).getTime(),
-      title: 'Default Title'
-    })
-    return this.jobsRepository.save(job)
+      createdAt: new Date().getTime(),
+      title: 'Empty job',
+    });
+    return this.jobsRepository
+      .save(job)
       .then(/*()=>{
         this.userService.updateUsersJobs(user, job)
-      }*/)
+      }*/);
   }
 
-  csvToArray(text) {
-    let p = '', row = [''], ret = [row], i = 0, r = 0, s = !0, l;
-    for (l of text) {
-      if ('"' === l) {
-        if (s && l === p) row[i] += l;
-        s = !s;
-      } else if (',' === l && s) l = row[++i] = '';
-      else if ('\n' === l && s) {
-        if ('\r' === p) row[i] = row[i].slice(0, -1);
-        row = ret[++r] = [l = '']; i = 0;
-      } else row[i] += l;
-      p = l;
-    }
-    return ret;
-  };
-
-  async getJobStatus(id: number){
-    const job: Job = await this.getJobByJobId(id);
-    if (job.jobUUID!=='unset'){
-    return this.httpService.get(`http://159.89.51.65:8080/workers/defaultWorker/jobs/${job.jobUUID}`, {
-      headers: {
-        'Authorization': 'Basic dXV1OmdnZzEyMw=='
-      }
-    }).pipe(map(res=>{
-      return {id: job.id, entriesProcessed: res.data.entriesProcessed,
-        launched: res.data.createdAt, status: res.data.status, created: job.createdAt, title: job.title}
-    }))}
-    else return {id: job.id, launched: 0, created: job.createdAt, title: job.title}
+  async getJobStatus(id: number) {
+    const {
+      createdAt,
+      id: jobId,
+      jobUUID,
+      title,
+    }: Job = await this.getJobByJobId(id);
+    if (jobUUID !== 'unset') {
+      return this.httpService
+        .get(
+          `http://159.89.51.65:8080/workers/old_defaultWorker/jobs/${jobUUID}`,
+          {
+            headers: {
+              Authorization: 'Basic dXV1OmdnZzEyMw==',
+            },
+          },
+        )
+        .pipe(
+          map(({ data }) => {
+            return {
+              id: jobId,
+              entriesProcessed: data.entriesProcessed,
+              launched: data.createdAt,
+              status: data.status,
+              created: createdAt,
+              title: title,
+            };
+          }),
+        );
+    } else
+      return {
+        id: jobId,
+        launched: 0,
+        created: createdAt,
+        title: title,
+      };
   }
 
   async getJobResult(id: number) {
     const job: Job = await this.getJobByJobId(id);
-    return this.httpService.get(`http://159.89.51.65:8080/workers/defaultWorker/jobs/${job.jobUUID}`, {
-      headers: {
-        'Authorization': 'Basic dXV1OmdnZzEyMw=='
-      }
-    }).toPromise()
-      .then(res => {
-        if (res.data.status === "finished"){
-        return this.httpService.get(`http://159.89.51.65:8080/${res.data.builtOutputFilePath}`, {
+    return this.httpService
+      .get(
+        `http://159.89.51.65:8080/workers/old_defaultWorker/jobs/${job.jobUUID}`,
+        {
           headers: {
-            'Authorization': 'Basic dXV1OmdnZzEyMw=='
-          }
-        }).pipe(map(res => {
-          fs.writeFile(`./data/${job.jobUUID}.csv`, res.data, (res)=>{})
-          return { data: this.csvToArray(res.data) }
-        }))}
-        else return {status: 'Job in progress'}
-      })
-
+            Authorization: 'Basic dXV1OmdnZzEyMw==',
+          },
+        },
+      )
+      .toPromise()
+      .then((res) => {
+        if (res.data.status === 'finished') {
+          return this.httpService
+            .get(`http://159.89.51.65:8080/${res.data.builtOutputFilePath}`, {
+              headers: {
+                Authorization: 'Basic dXV1OmdnZzEyMw==',
+              },
+            })
+            .pipe(
+              map((res) => {
+                fs.writeFile(
+                  `./data/${job.jobUUID}.csv`,
+                  res.data,
+                  (res) => {},
+                );
+                return { data: res.data };
+              }),
+            );
+        } else return { status: 'Job in progress' };
+      });
   }
 
-  async getOldJobResult(id: number){
+  async getOldJobResult(id: number) {
     const job: Job = await this.getJobByJobId(id);
     let fileData: string;
     try {
-      fileData = fs.readFileSync(`./data/${job.jobUUID}.csv`, "utf8");
+      fileData = fs.readFileSync(`./data/${job.jobUUID}.csv`, 'utf8');
+    } catch (err) {
+      return { message: "Couldn't find/read the requested file." };
     }
-    catch (err){
-      return {message: "Couldn't find/read the requested file."}
-    }
-    return {data: this.csvToArray(fileData)}
+    return { data: fileData };
   }
 
-  async deleteJob(id: number){
+  async deleteJob(id: number) {
     const job: Job = await this.getJobByJobId(id);
-    if (job){
-      await this.jobsRepository.delete(job)
-        .then(res=>res)
-        .catch(err=>err)
-    }
-    else return {message: 'Job not found'}
+    if (job) {
+      await this.jobsRepository
+        .delete(job)
+        .then((res) => res)
+        .catch((err) => err);
+    } else return { message: 'Job not found' };
   }
 
-  async getAllJobs(){
+  async getAllJobs() {
     const currentUser: User = await this.userService.getUserById(4);
-    const jobsArray: Job[] = await this.jobsRepository.find({author: currentUser});
-    const result: {id: number, entriesProcessed: number, launched: number, status: string, created: number, title: string}[] = [];
-    for (const elem of jobsArray){
-      await this.httpService.get(`http://159.89.51.65:8080/workers/defaultWorker/jobs/${elem.jobUUID}`, {
-        headers: {
-          'Authorization': 'Basic dXV1OmdnZzEyMw=='
-        }
-      }).toPromise().then(res=>{
-        result.push({id: elem.id, title: elem.title, entriesProcessed: res.data.entriesProcessed, created: elem.createdAt, launched: res.data.createdAt, status: res.data.status})
-      })
+    const jobsArray: Job[] = await this.jobsRepository.find({
+      author: currentUser,
+    });
+    const result: IJobData[] = [];
+    for (const elem of jobsArray) {
+      if (elem.jobUUID !== 'unset') {
+        await this.httpService
+          .get(
+            `http://159.89.51.65:8080/workers/old_defaultWorker/jobs/${elem.jobUUID}`,
+            {
+              headers: {
+                Authorization: 'Basic dXV1OmdnZzEyMw==',
+              },
+            },
+          )
+          .toPromise()
+          .then(({ data }) => {
+            result.push({
+              id: elem.id,
+              title: elem.title,
+              entriesProcessed: data.entriesProcessed,
+              created: elem.createdAt,
+              launched: data.createdAt,
+              status: data.status,
+            });
+          });
+      } else
+        result.push({
+          id: elem.id,
+          title: elem.title,
+          created: elem.createdAt,
+          launched: 0,
+        });
     }
-    return {jobs: result}
+    return { jobs: result };
   }
 }

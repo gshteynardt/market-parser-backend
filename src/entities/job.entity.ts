@@ -1,22 +1,27 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { User } from './user.entity';
 
 @Entity()
 export class Job {
-
   @Column()
   title: string;
 
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({unique: true, default: 'unset'})
+  @Column({ unique: true, default: 'unset' })
   jobUUID: string;
 
   @Column('bigint')
   createdAt: number;
 
-  @ManyToOne(type=> User, user => user.id, {cascade: true})
+  @ManyToOne((type) => User, (user) => user.id, { cascade: true })
   @JoinColumn()
-  author: User
+  author: User;
 }

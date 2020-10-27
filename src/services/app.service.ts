@@ -6,8 +6,7 @@ import { Observable } from 'rxjs';
 export class AppService {
   constructor(private httpService: HttpService) {}
 
-
-    /*getCSV(path){
+  /*getCSV(path){
       return this.httpService.get(`http://159.89.51.65:8080/${path}`, {
         headers: {
           'Authorization': 'Basic dXV1OmdnZzEyMw=='
@@ -17,5 +16,4 @@ export class AppService {
         return {info: res.data}
       }))
     }*/
-
 }

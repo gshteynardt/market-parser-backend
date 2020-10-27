@@ -6,12 +6,12 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('/add')
-  addUser(){
-    return this.usersService.addUser()
+  addUser() {
+    return this.usersService.addUser();
   }
 
   @Get('/all')
-  getAll(){
-    return this.usersService.getAll()
+  getAll() {
+    return this.usersService.getAll();
   }
 }

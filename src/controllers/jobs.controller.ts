@@ -1,24 +1,24 @@
 import { Controller, Get, Post, Req } from '@nestjs/common';
 import { JobsService } from '../services/jobs.service';
-import {Request} from 'express';
+import { Request } from 'express';
 
 @Controller('/jobs')
 export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 
   @Post('/add-job')
-  addJob(){
-    return this.jobsService.addJob( )
+  addJob() {
+    return this.jobsService.addJob();
   }
 
   @Get('/getAllJobs')
   async getAllJobs() {
-    return await this.jobsService.getAllJobs()
+    return await this.jobsService.getAllJobs();
   }
 
   @Post('/getJobStatus')
-  getJobStatus(@Req() request: Request){
-    return this.jobsService.getJobStatus(request.body.id)
+  getJobStatus(@Req() request: Request) {
+    return this.jobsService.getJobStatus(request.body.id);
   }
 
   @Post('/getNewJobResult')
@@ -32,7 +32,7 @@ export class JobsController {
   }
 
   @Post('/deleteJob')
-  deleteJob(@Req() request: Request){
+  deleteJob(@Req() request: Request) {
     return this.jobsService.deleteJob(request.body.id);
   }
 }

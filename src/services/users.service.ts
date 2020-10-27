@@ -10,25 +10,25 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    ) {}
+  ) {}
 
-  async addUser(){
+  async addUser() {
     const user = this.usersRepository.create({
       firstName: 'testName',
       lastName: 'testSurname',
       email: 'test2@gmail.com',
       password: 'password',
-      jobs: []
-    })
-    this.usersRepository.save(user).then(res=>console.log(res));
+      jobs: [],
+    });
+    this.usersRepository.save(user).then((res) => console.log(res));
   }
 
-  getUserById(id: number){
-    return this.usersRepository.findOne({id: id})
+  getUserById(id: number) {
+    return this.usersRepository.findOne({ id: id });
   }
 
-  getAll(){
-    return this.usersRepository.find()
+  getAll() {
+    return this.usersRepository.find();
   }
 
   /*updateUsersJobs(user, job){
