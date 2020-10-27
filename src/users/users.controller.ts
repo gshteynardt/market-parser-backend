@@ -1,21 +1,13 @@
 import {Controller, Post, Body, Request, UseGuards, Get, Param, Delete} from '@nestjs/common';
-import { UsersService } from '../users.service';
-import { User } from '../user.entity';
-import { AuthGuard } from '@nestjs/passport';
-import { AuthService } from '../../auth/auth.service';
+import { UsersService } from './users.service';
+import { User } from './user.entity';
+
 
 @Controller('users')
 export class UsersController {
   constructor(
       private service: UsersService,
-      private authService: AuthService,
   ) {}
-
-  @UseGuards(AuthGuard('local'))
-  @Post('auth/login')
-  async login(@Request() req) {
-    return this.authService.login(req.user);
-  }
 
   @Post('create')
   async create(@Body() user: User) {
