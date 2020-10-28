@@ -1,11 +1,9 @@
 import { HttpModule, Module } from '@nestjs/common';
-import { AppController } from '../controllers/app.controller';
-import { AppService } from '../services/app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { JobsModule } from './jobs.module';
-import { UsersModule } from './users.module';
-import { User } from '../entities/user.entity';
-import { Job } from '../entities/job.entity';
+import { User } from '../users/entities/user.entity';
+import { Job } from '../jobs/entities/job.entity';
+import { UsersModule } from '../users/modules/users.module';
+import { JobsModule } from '../jobs/modules/jobs.module';
 
 @Module({
   imports: [
@@ -29,7 +27,5 @@ import { Job } from '../entities/job.entity';
     UsersModule,
     JobsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

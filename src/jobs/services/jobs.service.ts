@@ -2,9 +2,9 @@ import { HttpService, Injectable } from '@nestjs/common';
 import { Job } from '../entities/job.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UsersService } from './users.service';
 import { map } from 'rxjs/operators';
-import { User } from '../entities/user.entity';
+import { UsersService } from '../../users/services/users.service';
+import { User } from '../../users/entities/user.entity';
 const fs = require('fs');
 
 export interface IJobData {
