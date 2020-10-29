@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 const jwt = require('jsonwebtoken');
 import { jwtConstants } from '../constants';
 
-export const logger = (req: Request, res: Response, next: Function) => {
+export const authMiddleware = (req: Request, res: Response, next: Function) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
