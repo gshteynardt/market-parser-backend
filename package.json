@@ -59,10 +59,10 @@
     "prettier": "^1.19.1",
     "supertest": "^4.0.2",
     "ts-jest": "26.2.0",
-    "ts-loader": "^6.2.1",
+    "ts-loader": "^7.0.5",
     "ts-node": "9.0.0",
     "tsconfig-paths": "^3.9.0",
-    "typescript": "^3.7.4"
+    "typescript": "^3.9.3"
   },
   "jest": {
     "moduleFileExtensions": [
