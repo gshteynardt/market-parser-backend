@@ -2,8 +2,8 @@ import { HttpModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../users/entities/user.entity';
 import { Job } from '../jobs/entities/job.entity';
-import { UsersModule } from '../users/modules/users.module';
-import { JobsModule } from '../jobs/modules/jobs.module';
+import { UsersModule } from '../users/users.module';
+import { JobsModule } from '../jobs/jobs.module';
 
 @Module({
   imports: [

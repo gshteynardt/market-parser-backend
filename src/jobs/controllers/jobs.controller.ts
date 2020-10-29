@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req } from '@nestjs/common';
+import { Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { JobsService } from '../services/jobs.service';
 import { Request } from 'express';
 
@@ -6,33 +6,33 @@ import { Request } from 'express';
 export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 
-  @Post('/add-job')
+  @Post('/create')
   addJob() {
     return this.jobsService.addJob();
   }
 
-  @Get('/getAllJobs')
+  @Get('/all')
   async getAllJobs() {
     return await this.jobsService.getAllJobs();
   }
 
-  @Post('/getJobStatus')
-  getJobStatus(@Req() request: Request) {
-    return this.jobsService.getJobStatus(request.body.id);
+  @Get('/:id/status')
+  getJobStatus(@Param() params) {
+    return this.jobsService.getJobStatus(parseInt(params.id));
   }
 
-  @Post('/getNewJobResult')
-  getJob(@Req() request: Request) {
-    return this.jobsService.getJobResult(request.body.id);
+  @Get('/:id/result/old')
+  getJob(@Param() params) {
+    return this.jobsService.getJobResult(params.id);
   }
 
-  @Post('/getOldJobResult')
-  getOldJob(@Req() request: Request) {
-    return this.jobsService.getOldJobResult(request.body.id);
+  @Get('/:id/result/new')
+  getOldJob(@Param() params) {
+    return this.jobsService.getOldJobResult(params.id);
   }
 
-  @Post('/deleteJob')
-  deleteJob(@Req() request: Request) {
-    return this.jobsService.deleteJob(request.body.id);
+  @Post('/:id/remove')
+  deleteJob(@Param() params) {
+    return this.jobsService.deleteJob(params.id);
   }
 }

@@ -5,6 +5,8 @@ import { Repository } from 'typeorm';
 import { map } from 'rxjs/operators';
 import { UsersService } from '../../users/services/users.service';
 import { User } from '../../users/entities/user.entity';
+import {coreApiService} from '../../coreApi/services/coreApi.service';
+
 const fs = require('fs');
 
 export interface IJobData {
@@ -22,7 +24,7 @@ export class JobsService {
     @InjectRepository(Job)
     private jobsRepository: Repository<Job>,
     private userService: UsersService,
-    private httpService: HttpService,
+    private coreApiService: coreApiService
   ) {}
 
   async getJobByJobUUID(uuid: string) {
@@ -34,17 +36,23 @@ export class JobsService {
   }
 
   async addJob() {
-    const user = await this.userService.getUserById(4);
+    const user = await this.userService.getUserById(1);
     const job = this.jobsRepository.create({
       author: user,
       createdAt: new Date().getTime(),
-      title: 'Empty job',
+      title: 'Ready job',
+      jobUUID: '1603115662214_0x33946741255392743'
     });
     return this.jobsRepository
       .save(job)
-      .then(/*()=>{
-        this.userService.updateUsersJobs(user, job)
-      }*/);
+      .then((res)=> {
+        return {
+          title: res.title,
+          createdAt: res.createdAt,
+          id: res.id
+        }
+      })
+      .catch(err=>err)
   }
 
   async getJobStatus(id: number) {
@@ -54,16 +62,8 @@ export class JobsService {
       jobUUID,
       title,
     }: Job = await this.getJobByJobId(id);
-    if (jobUUID !== 'unset') {
-      return this.httpService
-        .get(
-          `http://159.89.51.65:8080/workers/old_defaultWorker/jobs/${jobUUID}`,
-          {
-            headers: {
-              Authorization: 'Basic dXV1OmdnZzEyMw==',
-            },
-          },
-        )
+    if (jobUUID) {
+      return this.coreApiService.getStatus(jobUUID)
         .pipe(
           map(({ data }) => {
             return {
@@ -87,24 +87,11 @@ export class JobsService {
 
   async getJobResult(id: number) {
     const job: Job = await this.getJobByJobId(id);
-    return this.httpService
-      .get(
-        `http://159.89.51.65:8080/workers/old_defaultWorker/jobs/${job.jobUUID}`,
-        {
-          headers: {
-            Authorization: 'Basic dXV1OmdnZzEyMw==',
-          },
-        },
-      )
+    return this.coreApiService.getStatus(job.id)
       .toPromise()
       .then((res) => {
         if (res.data.status === 'finished') {
-          return this.httpService
-            .get(`http://159.89.51.65:8080/${res.data.builtOutputFilePath}`, {
-              headers: {
-                Authorization: 'Basic dXV1OmdnZzEyMw==',
-              },
-            })
+          return this.coreApiService.getResult(job.id)
             .pipe(
               map((res) => {
                 fs.writeFile(
@@ -141,22 +128,14 @@ export class JobsService {
   }
 
   async getAllJobs() {
-    const currentUser: User = await this.userService.getUserById(4);
+    const currentUser: User = await this.userService.getUserById(1);
     const jobsArray: Job[] = await this.jobsRepository.find({
       author: currentUser,
     });
     const result: IJobData[] = [];
     for (const elem of jobsArray) {
-      if (elem.jobUUID !== 'unset') {
-        await this.httpService
-          .get(
-            `http://159.89.51.65:8080/workers/old_defaultWorker/jobs/${elem.jobUUID}`,
-            {
-              headers: {
-                Authorization: 'Basic dXV1OmdnZzEyMw==',
-              },
-            },
-          )
+      if (elem.jobUUID) {
+        await this.coreApiService.getAll(currentUser, elem.jobUUID)
           .toPromise()
           .then(({ data }) => {
             result.push({

@@ -15,7 +15,7 @@ export class Job {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true, default: 'unset' })
+  @Column({ unique: true, nullable: true })
   jobUUID: string;
 
   @Column('bigint')
