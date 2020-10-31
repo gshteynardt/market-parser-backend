@@ -1,13 +1,10 @@
-import {Controller, Post, Body, Get, Param, Delete} from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Delete } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { User } from '../entities/user.entity';
 
-
 @Controller('users')
 export class UsersController {
-  constructor(
-      private service: UsersService,
-  ) {}
+  constructor(private service: UsersService) {}
 
   @Post('create')
   async create(@Body() user: User) {
@@ -15,7 +12,7 @@ export class UsersController {
     return {
       email: return_user.email,
       full_name: return_user.full_name,
-    }
+    };
   }
 
   @Get()
@@ -32,5 +29,4 @@ export class UsersController {
   // remove(@Param('id', ) id: string): Promise<void> {
   //   return this.service.remove(id);
   // }
-
 }

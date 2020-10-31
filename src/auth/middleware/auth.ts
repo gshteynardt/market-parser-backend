@@ -6,7 +6,7 @@ export const authMiddleware = (req: Request, res: Response, next: Function) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    return res.status(401).send({message: 'authorization required'})
+    return res.status(401).send({ message: 'authorization required' });
   }
 
   const token = authorization.replace('Bearer ', '');
@@ -16,13 +16,10 @@ export const authMiddleware = (req: Request, res: Response, next: Function) => {
   try {
     payload = jwt.verify(token, jwtConstants.secret);
   } catch (err) {
-    return res
-        .status(401)
-        .send({message: 'authorization required'});
+    return res.status(401).send({ message: 'authorization required' });
   }
 
   req.user = payload;
 
   next();
 };
-

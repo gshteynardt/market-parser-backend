@@ -18,13 +18,17 @@ export class Job {
   @Column({ unique: true, nullable: true })
   jobUUID: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   totalRows: number;
 
   @Column('bigint')
   createdAt: number;
 
-  @ManyToOne((type) => User, (user) => user.id, { cascade: true })
+  @ManyToOne(
+    type => User,
+    user => user.id,
+    { cascade: true },
+  )
   @JoinColumn()
   author: User;
 }

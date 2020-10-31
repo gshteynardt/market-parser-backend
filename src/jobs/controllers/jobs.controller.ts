@@ -1,4 +1,12 @@
-import { Controller, Delete, Get, Param, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { JobsService } from '../services/jobs.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
@@ -25,13 +33,13 @@ export class JobsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/:id/result/old')
+  @Get('/:id/result/new')
   getJob(@Param() params, @Request() req) {
     return this.jobsService.getJobResult(params.id, req.user.email);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/:id/result/new')
+  @Get('/:id/result/old')
   getOldJob(@Param() params, @Request() req) {
     return this.jobsService.getOldJobResult(params.id, req.user.email);
   }

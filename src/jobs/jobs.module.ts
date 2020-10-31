@@ -16,7 +16,7 @@ import { coreApiModule } from '../coreApi/coreApi.module';
       timeout: 5000,
       maxRedirects: 5,
     }),
-    coreApiModule
+    coreApiModule,
   ],
   providers: [JobsService, UsersService, coreApiService],
   controllers: [JobsController],
