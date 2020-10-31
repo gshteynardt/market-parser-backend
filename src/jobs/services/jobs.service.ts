@@ -1,4 +1,4 @@
-import { HttpService, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { Job } from '../entities/job.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -6,6 +6,7 @@ import { map } from 'rxjs/operators';
 import { UsersService } from '../../users/services/users.service';
 import { User } from '../../users/entities/user.entity';
 import {coreApiService} from '../../coreApi/services/coreApi.service';
+import { HttpException } from '@nestjs/common/exceptions/http.exception';
 
 const fs = require('fs');
 
@@ -27,41 +28,51 @@ export class JobsService {
     private coreApiService: coreApiService
   ) {}
 
-  async getJobByJobUUID(uuid: string) {
-    return await this.jobsRepository.findOne({ jobUUID: uuid });
+  async compareUserJob(email, jobId){
+    const currentUser = await this.userService.findOne(email);
+    if (email) {
+      const job: Job = await this.jobsRepository.findOne({
+        author: currentUser,
+        id: jobId
+      });
+      if (job) {
+        return job
+      }
+      else throw new HttpException({message: 'Job not found'}, HttpStatus.NOT_FOUND);
+    }
+    else throw new HttpException({message: 'Invalid user'}, HttpStatus.UNAUTHORIZED);
   }
 
-  async getJobByJobId(id: number) {
-    return await this.jobsRepository.findOne({ id: id });
+  async addJob(email: string, title: string) {
+    const user = await this.userService.findOne(email);
+    if (user) {
+      const job = this.jobsRepository.create({
+        author: user,
+        createdAt: new Date().getTime(),
+        title: title,
+        /*jobUUID: '1603115662214_0x33946741255392743'*/
+      });
+      return this.jobsRepository
+        .save(job)
+        .then((res) => {
+          return {
+            title: res.title,
+            createdAt: res.createdAt,
+            id: res.id
+          }
+        })
+        .catch(err => err)
+    }
+    else throw new HttpException({message: 'Invalid user'}, HttpStatus.UNAUTHORIZED);
   }
 
-  async addJob() {
-    const user = await this.userService.getUserById(1);
-    const job = this.jobsRepository.create({
-      author: user,
-      createdAt: new Date().getTime(),
-      title: 'Ready job',
-      jobUUID: '1603115662214_0x33946741255392743'
-    });
-    return this.jobsRepository
-      .save(job)
-      .then((res)=> {
-        return {
-          title: res.title,
-          createdAt: res.createdAt,
-          id: res.id
-        }
-      })
-      .catch(err=>err)
-  }
-
-  async getJobStatus(id: number) {
+  async getJobStatus(id: number, email: string) {
     const {
       createdAt,
       id: jobId,
       jobUUID,
       title,
-    }: Job = await this.getJobByJobId(id);
+    }: Job = await this.compareUserJob(email, id);
     if (jobUUID) {
       return this.coreApiService.getStatus(jobUUID)
         .pipe(
@@ -85,8 +96,8 @@ export class JobsService {
       };
   }
 
-  async getJobResult(id: number) {
-    const job: Job = await this.getJobByJobId(id);
+  async getJobResult(id: number, email: string) {
+    const job: Job = await this.compareUserJob(email, id);
     return this.coreApiService.getStatus(job.id)
       .toPromise()
       .then((res) => {
@@ -97,7 +108,7 @@ export class JobsService {
                 fs.writeFile(
                   `./data/${job.jobUUID}.csv`,
                   res.data,
-                  (res) => {},
+                  () => {},
                 );
                 return { data: res.data };
               }),
@@ -106,8 +117,8 @@ export class JobsService {
       });
   }
 
-  async getOldJobResult(id: number) {
-    const job: Job = await this.getJobByJobId(id);
+  async getOldJobResult(id: number, email: string) {
+    const job: Job = await this.compareUserJob(email, id);
     let fileData: string;
     try {
       fileData = fs.readFileSync(`./data/${job.jobUUID}.csv`, 'utf8');
@@ -117,8 +128,8 @@ export class JobsService {
     return { data: fileData };
   }
 
-  async deleteJob(id: number) {
-    const job: Job = await this.getJobByJobId(id);
+  async deleteJob(id: number, email: string) {
+    const job: Job = await this.compareUserJob(email, id);
     if (job) {
       await this.jobsRepository
         .delete(job)
@@ -127,8 +138,8 @@ export class JobsService {
     } else return { message: 'Job not found' };
   }
 
-  async getAllJobs() {
-    const currentUser: User = await this.userService.getUserById(1);
+  async getAllJobs(email: string) {
+    const currentUser: User = await this.userService.findOne(email);
     const jobsArray: Job[] = await this.jobsRepository.find({
       author: currentUser,
     });

@@ -18,6 +18,9 @@ export class Job {
   @Column({ unique: true, nullable: true })
   jobUUID: string;
 
+  @Column({nullable: true})
+  totalRows: number;
+
   @Column('bigint')
   createdAt: number;
 
