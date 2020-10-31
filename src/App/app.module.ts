@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '../auth/auth.module';
 import {AppController} from "./controllers/app.controller";
 import { ConfigModule } from 'nestjs-dotenv';
+import { JobsModule } from '../jobs/jobs.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ConfigModule } from 'nestjs-dotenv';
       maxRedirects: 5,
     }),
     UsersModule,
+    JobsModule,
     AuthModule,
     ConfigModule.forRoot(),
   ],
