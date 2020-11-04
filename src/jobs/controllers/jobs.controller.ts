@@ -3,7 +3,7 @@ import {
   Delete,
   Get,
   Param,
-  Post,
+  Post, Query,
   Request, UploadedFile,
   UseGuards, UseInterceptors,
 } from '@nestjs/common';
@@ -22,10 +22,10 @@ export class JobsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('/:id/preStart')
+  @Post('/:id/create/core')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadedFile(@UploadedFile() file, @Request() request, @Param() params) {
-    return this.jobsService.createCoreJob(file, params.id ,request.user);
+  async uploadedFile(@UploadedFile() file, @Query() query, @Request() request, @Param() params) {
+    return this.jobsService.createCoreJob(query.totalRows, file, params.id ,request.user);
   }
 
 

@@ -9,7 +9,7 @@ export class coreApiService {
     this.authToken = 'Basic dXV1OmdnZzEyMw==';
   }
 
-  _getPath(file){
+  _getPath(file: File){
     return this.httpService
     .post(
       `${this.baseUrl}/upload_xls_file`, {
@@ -22,8 +22,9 @@ export class coreApiService {
       }).toPromise().then(res => res.data)
   }
 
-  async addNewJob(nameWorker: string, file){
+  async addNewJob(nameWorker: string, file: File){
     const path = await this._getPath(file);
+
     return  this.httpService
     .post(`${this.baseUrl}/workers/${nameWorker}/createJob_importXLS?forceRun=true`, {
         filePath: path,

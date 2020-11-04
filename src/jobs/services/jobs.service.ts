@@ -75,14 +75,16 @@ export class JobsService {
       );
   }
 
-  async createCoreJob(file, id: number, user) {
+  async createCoreJob(totalRows: number, file: File, id: number, user: User) {
     const nameWorker = 'defaultWorker';
-    const jobID = await this.coreApiService.addNewJob(nameWorker, file);
-    console.log(jobID);
-    const currentUser = await this.userService.findOne(user.email);
-    const job: Job|boolean = await this.compareUserJob(user, id);
+    // const jobID = await this.coreApiService.addNewJob(nameWorker, file);
+    // временная джоба
+    const jobID = '1604501042728_0x7954176052416189';
+    const job: Job|boolean = await this.compareUserJob(user.email, id);
+
     if (job){
       job.jobUUID = jobID;
+      job.totalRows = totalRows;
     }
     return this.jobsRepository
     .save(job as Job)
