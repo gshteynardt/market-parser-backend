@@ -75,6 +75,21 @@ export class JobsService {
       );
   }
 
+  async createCoreJob(file, id: number, user) {
+    const nameWorker = 'defaultWorker';
+    const jobID = await this.coreApiService.addNewJob(nameWorker, file);
+    console.log(jobID);
+    const currentUser = await this.userService.findOne(user.email);
+    const job: Job|boolean = await this.compareUserJob(user, id);
+    if (job){
+      job.jobUUID = jobID;
+    }
+    return this.jobsRepository
+    .save(job as Job)
+    .then(res=>res)
+  }
+
+
   async getJobStatus(id: number, email: string) {
     const {
       createdAt,
