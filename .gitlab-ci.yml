@@ -35,4 +35,4 @@ deploy-stage:
     only:
     - /stage/
     script:
-    - scp -P 2222 -i ./key -r dist/* gitlab@berezadev.com:$STAGE_BACKEND_PATH
+    - scp -P 2222 -i ./key -r node_modules gitlab@berezadev.com:$STAGE_BACKEND_PATH
