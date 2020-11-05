@@ -28,6 +28,12 @@ export class JobsController {
     return this.jobsService.createCoreJob(query.totalRows, file, params.id ,request.user);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post('/:id/get/data')
+  async getData(@Param() params, @Request() req) {
+    return await this.jobsService.getJobData(params.id, req.user.email)
+  }
+
 
   @UseGuards(JwtAuthGuard)
   @Get('/all')

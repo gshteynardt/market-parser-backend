@@ -75,11 +75,13 @@ export class JobsService {
       );
   }
 
-  async createCoreJob(totalRows: number, file: File, id: number, user: User) {
+  async createCoreJob(totalRows: number, file: any, id: number, user: User) {
+    console.log(file);
     const nameWorker = 'defaultWorker';
-    // const jobID = await this.coreApiService.addNewJob(nameWorker, file);
+    const jobID = await this.coreApiService.addNewJob(nameWorker, file);
     // временная джоба
-    const jobID = '1604501042728_0x7954176052416189';
+    // const jobID = '1604501042728_0x7954176052416189';
+    fs.writeFile(`./data/import_${jobID}.xlsx`, file.buffer, () => {});
     const job: Job|boolean = await this.compareUserJob(user.email, id);
 
     if (job){
@@ -89,6 +91,17 @@ export class JobsService {
     return this.jobsRepository
     .save(job as Job)
     .then(res=>res)
+  }
+
+  async getJobData(id: number, email: string) {
+    const job: Job = await this.compareUserJob(email, id);
+    let fileData: string;
+    try {
+      fileData = fs.readFileSync(`./data/import_${job.jobUUID}.xlsx`, 'utf8');
+    } catch (err) {
+      return { message: "Couldn't find/read the requested file." };
+    }
+    return { data: fileData };
   }
 
 
