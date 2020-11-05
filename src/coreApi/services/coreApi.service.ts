@@ -1,17 +1,20 @@
 import { HttpService, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+
 
 @Injectable()
 export class coreApiService {
   private baseUrl: string;
   private authToken: string;
-  constructor(private httpService: HttpService) {
-    this.baseUrl = 'http://159.89.51.65:8080';
-    this.authToken = 'Basic dXV1OmdnZzEyMw==';
+  constructor(private httpService: HttpService, private configService: ConfigService) {
+    this.baseUrl = configService.get('CORE_URL');
+    this.authToken = configService.get('CORE_TOKEN');
   }
 
   getStatus(jobUUID) {
+    console.log(this.baseUrl)
     return this.httpService.get(
-      `${this.baseUrl}/workers/old_defaultWorker/jobs/${jobUUID}`,
+      `${this.baseUrl}/workers/forDimaWorker/jobs/${jobUUID}`,
       {
         headers: {
           Authorization: this.authToken,
@@ -22,18 +25,7 @@ export class coreApiService {
 
   getResult(jobUUID) {
     return this.httpService.get(
-      `${this.baseUrl}/workers/old_defaultWorker/jobs/${jobUUID}/output`,
-      {
-        headers: {
-          Authorization: this.authToken,
-        },
-      },
-    );
-  }
-
-  getAll(user, jobUUID) {
-    return this.httpService.get(
-      `${this.baseUrl}/workers/old_defaultWorker/jobs/${jobUUID}`,
+      `${this.baseUrl}/workers/forDimaWorker/jobs/${jobUUID}/output`,
       {
         headers: {
           Authorization: this.authToken,

@@ -56,7 +56,7 @@ export class JobsService {
         author: user,
         createdAt: new Date().getTime(),
         title: title,
-        /*jobUUID: '1603115662214_0x33946741255392743'*/
+        /*jobUUID: '1604426093350_0x34241387392811506'*/
       });
       return this.jobsRepository
         .save(job)
@@ -107,7 +107,7 @@ export class JobsService {
   async getJobResult(id: number, email: string) {
     const job: Job = await this.compareUserJob(email, id);
     return this.coreApiService
-      .getStatus(job.id)
+      .getStatus(job.jobUUID)
       .toPromise()
       .then(res => {
         if (res.data.status === 'finished') {
@@ -151,7 +151,7 @@ export class JobsService {
     for (const elem of jobsArray) {
       if (elem.jobUUID) {
         await this.coreApiService
-          .getAll(currentUser, elem.jobUUID)
+          .getStatus(elem.jobUUID)
           .toPromise()
           .then(({ data }) => {
             result.push({

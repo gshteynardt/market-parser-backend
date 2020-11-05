@@ -53,6 +53,19 @@ export class UsersService {
     return this.usersRepository.findOne(id);
   }
 
+  /*async getCurrent(email: string){
+    const user: User = await this.usersRepository.findOne({ email });
+    if (user) {
+      return {
+        full_name: user.full_name,
+        email: user.email
+      }
+    }
+    else throw new HttpException(
+      { message: 'Invalid user' },
+      HttpStatus.NOT_FOUND);
+  }*/
+
   async findOne(email: string): Promise<User | undefined> {
     return this.usersRepository.findOne({ email });
   }

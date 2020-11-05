@@ -24,6 +24,9 @@ export class User {
   @Column({ length: 256 })
   full_name: string;
 
+  @Column({nullable: true})
+  profile_pic: string;
+
   @Column({ length: 256 })
   password: string;
 
