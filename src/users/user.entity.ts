@@ -1,4 +1,4 @@
-import {Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToMany, BeforeInsert} from 'typeorm';
+import {Entity, Column, PrimaryGeneratedColumn, OneToMany, BeforeInsert} from 'typeorm';
 import { IsEmail } from 'class-validator';
 import { Job } from '../entities/job.entity';
 const bcrypt = require('bcrypt');

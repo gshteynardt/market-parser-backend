@@ -36,7 +36,6 @@ export class AppController {
   @Post('/profile/mutation/email')
   changeEmail(@Request() req) {
     const {body, user} = req;
-    console.log(body.email)
     return this.usersService.changeEmail(body.email, user);
   }
 
@@ -44,7 +43,6 @@ export class AppController {
   @Post('/profile/mutation/password')
   changePassword(@Request() req) {
     const {body, user} = req;
-
     return this.usersService.changePassword(body.password, user);
   }
 
