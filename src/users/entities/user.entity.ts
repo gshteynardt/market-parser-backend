@@ -1,11 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  JoinColumn,
-  OneToMany,
-  BeforeInsert,
-} from 'typeorm';
+import {Entity, Column, PrimaryGeneratedColumn, OneToMany, BeforeInsert} from 'typeorm';
 import { IsEmail } from 'class-validator';
 import { Job } from '../../jobs/entities/job.entity';
 
@@ -17,7 +10,7 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 256 })
+  @Column({ length: 256, unique: true })
   @IsEmail()
   email: string;
 

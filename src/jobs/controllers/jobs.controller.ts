@@ -3,12 +3,13 @@ import {
   Delete,
   Get,
   Param,
-  Post,
-  Request,
-  UseGuards,
+  Post, Query,
+  Request, UploadedFile,
+  UseGuards, UseInterceptors,
 } from '@nestjs/common';
 import { JobsService } from '../services/jobs.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import {FileInterceptor} from '@nestjs/platform-express';
 
 @Controller('/jobs')
 export class JobsController {
@@ -19,6 +20,20 @@ export class JobsController {
   addJob(@Request() req) {
     return this.jobsService.addJob(req.user.email, req.body.title);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/:id/create/core')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadedFile(@UploadedFile() file, @Query() query, @Request() request, @Param() params) {
+    return this.jobsService.createCoreJob(query.totalRows, file, params.id ,request.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/:id/get/data')
+  async getData(@Param() params, @Request() req) {
+    return await this.jobsService.getJobData(params.id, req.user.email)
+  }
+
 
   @UseGuards(JwtAuthGuard)
   @Get('/all')
