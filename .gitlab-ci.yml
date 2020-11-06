@@ -28,7 +28,6 @@ build:
     - PORT=$STAGE_PORT npx nest build
     - cp -r ./dist/* /stage
     - cp package*.json /stage
-    - cd /stage && ls -la
 
 deploy-stage:
     stage: deploy
@@ -37,5 +36,6 @@ deploy-stage:
     only:
     - /stage/
     script:
+    - scp -P 2222 -i ./key *.json gitlab@berezadev.com:$STAGE_BACKEND_PATH
     - scp -P 2222 -i ./key -r dist/* gitlab@berezadev.com:$STAGE_BACKEND_PATH
     - ssh -p 2222 -i ./key gitlab@berezadev.com "cd $STAGE_BACKEND_PATH && npm ci --prefer-offline"
