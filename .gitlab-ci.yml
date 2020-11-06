@@ -26,7 +26,8 @@ build:
   script:
     - mkdir /stage
     - PORT=$STAGE_PORT npx nest build
-    - cp -r ./dist/* /stage && cp ./package*.json /stage
+    - cp -r ./dist/* /stage
+    - cp ./package*.json /stage
 
 deploy-stage:
     stage: deploy
