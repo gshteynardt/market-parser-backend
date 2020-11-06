@@ -24,10 +24,7 @@ build:
     paths:
       - ./dist
   script:
-    - mkdir /stage
     - PORT=$STAGE_PORT npx nest build
-    - cp -r ./dist/* /stage
-    - cp package*.json /stage
 
 deploy-stage:
     stage: deploy
@@ -36,7 +33,7 @@ deploy-stage:
     only:
     - /stage/
     script:
-    - echo "$ENV_STAGE" > dist/.env
-    - scp -P 2222 -i ./key *.json gitlab@berezadev.com:$STAGE_BACKEND_PATH
+    - echo "$ENV_STAGE" > .env
+    - scp -P 2222 -i ./key *.json .env gitlab@berezadev.com:$STAGE_BACKEND_PATH
     - scp -P 2222 -i ./key -r dist/* gitlab@berezadev.com:$STAGE_BACKEND_PATH
     - ssh -p 2222 -i ./key gitlab@berezadev.com "cd $STAGE_BACKEND_PATH && npm ci --prefer-offline && npx typeorm schema:sync && pm2 restart parser"
