@@ -17,6 +17,7 @@ export interface IJobData {
   status?: string;
   created: number;
   title: string;
+  totalRows?: number
 }
 
 @Injectable()
@@ -56,7 +57,6 @@ export class JobsService {
         author: user,
         createdAt: new Date().getTime(),
         title: title,
-        /*jobUUID: '1604426093350_0x34241387392811506'*/
       });
       return this.jobsRepository
         .save(job)
@@ -77,7 +77,7 @@ export class JobsService {
 
   async createCoreJob(totalRows: number, file: any, id: number, user: User) {
     console.log(file);
-    const nameWorker = 'defaultWorker';
+    const nameWorker = 'preview_worker';
     const jobID = await this.coreApiService.addNewJob(nameWorker, file);
     // временная джоба
     // const jobID = '1604501042728_0x7954176052416189';
@@ -111,12 +111,14 @@ export class JobsService {
       id: jobId,
       jobUUID,
       title,
+      totalRows
     }: Job = await this.compareUserJob(email, id);
     if (jobUUID) {
       return this.coreApiService.getStatus(jobUUID).pipe(
         map(({ data }) => {
           return {
             id: jobId,
+            totalRows: totalRows,
             entriesProcessed: data.entriesProcessed,
             launched: data.createdAt,
             status: data.status,
@@ -191,6 +193,7 @@ export class JobsService {
               created: elem.createdAt,
               launched: data.createdAt,
               status: data.status,
+              totalRows: elem.totalRows
             });
           });
       } else

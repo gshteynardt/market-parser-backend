@@ -28,11 +28,11 @@ export class coreApiService {
     const path = await this._getPath(file);
 
     return  this.httpService
-    .post(`${this.baseUrl}/workers/${nameWorker}/createJob_importXLS?forceRun=true`, {
+    .post(`${this.baseUrl}/workers/${nameWorker}/createJob_importXLS?forceRun=true`, JSON.stringify({
         filePath: path,
         searchTextColumnIndex: 0,
         productUrlColumnIndex: 1,
-      },
+      }),
       {
         headers: {
           Authorization: 'Basic dXV1OmdnZzEyMw==',
@@ -45,7 +45,7 @@ export class coreApiService {
   getStatus(jobUUID) {
     console.log(this.baseUrl)
     return this.httpService.get(
-      `${this.baseUrl}/workers/forDimaWorker/jobs/${jobUUID}`,
+      `${this.baseUrl}/workers/preview_worker/jobs/${jobUUID}`,
       {
         headers: {
           Authorization: this.authToken,
@@ -56,7 +56,18 @@ export class coreApiService {
 
   getResult(jobUUID) {
     return this.httpService.get(
-      `${this.baseUrl}/workers/forDimaWorker/jobs/${jobUUID}/output`,
+      `${this.baseUrl}/workers/preview_worker/jobs/${jobUUID}/output`,
+      {
+        headers: {
+          Authorization: this.authToken,
+        },
+      },
+    );
+  }
+
+  getAll(user, jobUUID) {
+    return this.httpService.get(
+      `${this.baseUrl}/workers/preview_worker/jobs/${jobUUID}`,
       {
         headers: {
           Authorization: this.authToken,
