@@ -36,4 +36,4 @@ deploy-stage:
     only:
     - /stage/
     script:
-    - ssh -p 2222 -i ./key gitlab@berezadev.com "cd $STAGE_BACKEND_PATH && npm ci --prefer-offline"
+    - scp -p 2222 -i ./key gitlab@berezadev.com "cd $STAGE_BACKEND_PATH && npm ci --prefer-offline"
