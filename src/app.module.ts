@@ -1,0 +1,20 @@
+import { Module } from '@nestjs/common';
+import { UsersModule } from './users/users.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
+import {AppController} from "./app.controller";
+import {AppService} from "./app.service";
+import { ConfigModule } from 'nestjs-dotenv';
+
+
+@Module({
+  imports: [
+    TypeOrmModule.forRoot(),
+    UsersModule,
+    AuthModule,
+    ConfigModule.forRoot(),
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
