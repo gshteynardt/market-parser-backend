@@ -183,7 +183,7 @@ export class JobsService {
     for (const elem of jobsArray) {
       if (elem.jobUUID) {
         await this.coreApiService
-          .getAll(currentUser, elem.jobUUID)
+          .getStatus(elem.jobUUID)
           .toPromise()
           .then(({ data }) => {
             result.push({

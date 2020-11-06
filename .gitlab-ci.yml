@@ -1,0 +1,39 @@
+image: node:latest
+
+stages:
+  - build
+  - deploy
+
+# Cache modules in between jobs
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .npm/
+
+before_script:
+  - mkdir -p ~/.ssh
+  - echo "$bereza_private_key" > ./key
+  - chmod 700 ./key
+  - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+  - npm ci --cache .npm --prefer-offline
+
+build:
+  stage: build
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - ./dist
+  script:
+    - PORT=$STAGE_PORT npx nest build
+
+deploy-stage:
+    stage: deploy
+    dependencies:
+      - build
+    only:
+    - /stage/
+    script:
+    - echo "$ENV_STAGE" > .env
+    - scp -P 2222 -i ./key *.json .env gitlab@berezadev.com:$STAGE_BACKEND_PATH
+    - scp -P 2222 -i ./key -r dist/* gitlab@berezadev.com:$STAGE_BACKEND_PATH
+    - ssh -p 2222 -i ./key gitlab@berezadev.com "cd $STAGE_BACKEND_PATH && npm ci --prefer-offline && npx typeorm schema:sync && pm2 restart parser"

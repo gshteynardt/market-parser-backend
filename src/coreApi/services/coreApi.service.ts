@@ -1,12 +1,14 @@
 import { HttpService, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+
 
 @Injectable()
 export class coreApiService {
   private baseUrl: string;
   private authToken: string;
-  constructor(private httpService: HttpService) {
-    this.baseUrl = 'http://159.89.51.65:8080';
-    this.authToken = 'Basic dXV1OmdnZzEyMw==';
+  constructor(private httpService: HttpService, private configService: ConfigService) {
+    this.baseUrl = configService.get('CORE_URL');
+    this.authToken = configService.get('CORE_TOKEN');
   }
 
   _getPath(file: File){
@@ -41,6 +43,7 @@ export class coreApiService {
 
 
   getStatus(jobUUID) {
+    console.log(this.baseUrl)
     return this.httpService.get(
       `${this.baseUrl}/workers/preview_worker/jobs/${jobUUID}`,
       {

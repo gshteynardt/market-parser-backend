@@ -7,6 +7,7 @@ import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/services/users.service';
 import { coreApiService } from '../coreApi/services/coreApi.service';
 import { coreApiModule } from '../coreApi/coreApi.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
