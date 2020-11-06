@@ -38,4 +38,4 @@ deploy-stage:
     script:
     - scp -P 2222 -i ./key *.json gitlab@berezadev.com:$STAGE_BACKEND_PATH
     - scp -P 2222 -i ./key -r dist/* gitlab@berezadev.com:$STAGE_BACKEND_PATH
-    - ssh -p 2222 -i ./key gitlab@berezadev.com "cd $STAGE_BACKEND_PATH && npm ci --prefer-offline"
+    - ssh -p 2222 -i ./key gitlab@berezadev.com "cd $STAGE_BACKEND_PATH && npm ci --prefer-offline && npx typeorm schema:sync && pm2 restart parser"
