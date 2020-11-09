@@ -8,6 +8,7 @@ import { User } from '../../users/entities/user.entity';
 import { coreApiService } from '../../coreApi/services/coreApi.service';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
 
+const XLSX = require('xlsx');
 const fs = require('fs');
 
 export interface IJobData {
@@ -86,7 +87,6 @@ export class JobsService {
   }
 
   async createCoreJob(totalRows: number, file: any, id: number, user: User) {
-    console.log(file);
     const nameWorker = 'preview_worker';
     const jobID = await this.coreApiService.addNewJob(nameWorker, file);
     // временная джоба
@@ -156,10 +156,10 @@ export class JobsService {
           return this.coreApiService.getResult(job.jobUUID).pipe(
             map(res => {
               fs.writeFile(`./data/${job.jobUUID}.csv`, res.data, () => {});
-              return { data: res.data };
+              return { data: res.data, type: "Complete" };
             }),
           );
-        } else return { status: 'Job in progress' };
+        } else return this.getEmptyJobResult(job.jobUUID);
       });
   }
 
@@ -172,6 +172,19 @@ export class JobsService {
       return { message: "Couldn't find/read the requested file." };
     }
     return { data: fileData };
+  }
+
+  getEmptyJobResult(jobUUID: string){
+    let fileData;
+    try {
+      /*fileData = fs.readFileSync(`./data/import_${jobUUID}.xlsx`, 'utf8');*/
+      const wb = XLSX.readFile(`./data/import_${jobUUID}.xlsx`, {type: 'file'});
+      fileData = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1});
+    } catch (err) {
+      console.log(err);
+      return { message: "Couldn't find/read the requested file." };
+    }
+    return { data: fileData, type: "In progress" };
   }
 
   async deleteJob(id: number, email: string) {

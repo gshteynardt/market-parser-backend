@@ -71,6 +71,12 @@ export class JobsController {
     return this.jobsService.getOldJobResult(params.id, req.user.email);
   }
 
+  /*@UseGuards(JwtAuthGuard)
+  @Get('/:id/result/empy')
+  getEmptyJob(@Param() params, @Request() req) {
+    return this.jobsService.getEmptyJobResult(params.id, req.user.email);
+  }*/
+
   @UseGuards(JwtAuthGuard)
   @Delete('/:id/remove')
   deleteJob(@Param() params, @Request() req) {
