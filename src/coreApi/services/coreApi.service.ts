@@ -11,12 +11,12 @@ export class coreApiService {
     this.authToken = configService.get('CORE_TOKEN');
   }
 
-  _getPath(file: File){
+  _getPath(file: any){
     return this.httpService
-    .post(
-      `${this.baseUrl}/upload_xls_file`, {
-        data: file
-      }, {
+      .post(
+        `${this.baseUrl}/upload_xls_file`,
+    file.buffer,
+      {
         headers: {
           Authorization: this.authToken,
           'Content-type': 'application/octet-stream',
@@ -26,24 +26,44 @@ export class coreApiService {
 
   async addNewJob(nameWorker: string, file: File){
     const path = await this._getPath(file);
-
+    const json = JSON.stringify({
+      "filePath": path,
+      "searchTextColumnIndex": 0,
+      "productUrlColumnIndex": 1,
+    });
     return  this.httpService
-    .post(`${this.baseUrl}/workers/${nameWorker}/createJob_importXLS?forceRun=true`, JSON.stringify({
-        filePath: path,
-        searchTextColumnIndex: 0,
-        productUrlColumnIndex: 1,
-      }),
-      {
-        headers: {
-          Authorization: 'Basic dXV1OmdnZzEyMw==',
+      .post(`${this.baseUrl}/workers/${nameWorker}/createJob_importXLS?forceRun=true`, json,
+    {
+      headers: {
+        Authorization: 'Basic dXV1OmdnZzEyMw==',
           'Content-type': 'application/json',
-        }
-      }).toPromise().then(res => res.data.jobUUID)
+      }
+    }).toPromise().then(res => res.data.jobUUID)
   }
 
+  stopJob(jobUUID: string){
+    return this.httpService.get(
+      `${this.baseUrl}/workers/preview_worker/stop`,
+      {
+        headers: {
+          Authorization: this.authToken,
+        },
+      },
+    );
+  }
+
+  startJob(jobUUID: string){
+    return this.httpService.get(
+      `${this.baseUrl}/workers/preview_worker/run`,
+      {
+        headers: {
+          Authorization: this.authToken,
+        },
+      },
+    );
+  }
 
   getStatus(jobUUID) {
-    console.log(this.baseUrl)
     return this.httpService.get(
       `${this.baseUrl}/workers/preview_worker/jobs/${jobUUID}`,
       {

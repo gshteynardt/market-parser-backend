@@ -42,6 +42,18 @@ export class JobsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('/:id/stop')
+  async stopJob(@Param() params, @Request() req) {
+    return this.jobsService.stopJob(parseInt(params.id), req.user.email);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/:id/start')
+  async startJob(@Param() params, @Request() req) {
+    return this.jobsService.startJob(parseInt(params.id), req.user.email);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('/:id/status')
   getJobStatus(@Param() params, @Request() req) {
     return this.jobsService.getJobStatus(parseInt(params.id), req.user.email);
@@ -58,6 +70,12 @@ export class JobsController {
   getOldJob(@Param() params, @Request() req) {
     return this.jobsService.getOldJobResult(params.id, req.user.email);
   }
+
+  /*@UseGuards(JwtAuthGuard)
+  @Get('/:id/result/empy')
+  getEmptyJob(@Param() params, @Request() req) {
+    return this.jobsService.getEmptyJobResult(params.id, req.user.email);
+  }*/
 
   @UseGuards(JwtAuthGuard)
   @Delete('/:id/remove')
