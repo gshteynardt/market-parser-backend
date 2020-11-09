@@ -1,0 +1,12 @@
+{
+  "type": "mysql",
+  "host": "localhost",
+  "port": 3306,
+  "username": "root",
+  "password": "root",
+  "database": "PriceParser",
+  "entities": ["dist/**/*.entity.js"],
+  "synchronize": true,
+  "retryAttempts": 20,
+  "retryDelay": 2000
+}

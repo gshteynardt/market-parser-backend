@@ -41,9 +41,29 @@ export class coreApiService {
       }).toPromise().then(res => res.data.jobUUID)
   }
 
+  stopJob(jobUUID: string){
+    return this.httpService.get(
+      `${this.baseUrl}/workers/preview_worker/stop`,
+      {
+        headers: {
+          Authorization: this.authToken,
+        },
+      },
+    );
+  }
+
+  startJob(jobUUID: string){
+    return this.httpService.get(
+      `${this.baseUrl}/workers/preview_worker/run`,
+      {
+        headers: {
+          Authorization: this.authToken,
+        },
+      },
+    );
+  }
 
   getStatus(jobUUID) {
-    console.log(this.baseUrl)
     return this.httpService.get(
       `${this.baseUrl}/workers/preview_worker/jobs/${jobUUID}`,
       {

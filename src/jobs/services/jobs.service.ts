@@ -75,6 +75,16 @@ export class JobsService {
       );
   }
 
+  async stopJob(id: number, email: string){
+    const job: Job = await this.compareUserJob(email, id);
+    this.coreApiService.stopJob(job.jobUUID)
+  }
+
+  async startJob(id: number, email: string){
+    const job: Job = await this.compareUserJob(email, id);
+    this.coreApiService.startJob(job.jobUUID)
+  }
+
   async createCoreJob(totalRows: number, file: any, id: number, user: User) {
     console.log(file);
     const nameWorker = 'preview_worker';
