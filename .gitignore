@@ -5,3 +5,4 @@ dist
 data
 ormconfig.json
 node_modules
+.gitlab-ci.yml
