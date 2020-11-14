@@ -1,6 +1,7 @@
-import {Entity, Column, PrimaryGeneratedColumn, OneToMany, BeforeInsert} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, BeforeInsert, CreateDateColumn } from 'typeorm';
 import { IsEmail } from 'class-validator';
 import { Job } from '../../jobs/entities/job.entity';
+import DateTimeFormat = Intl.DateTimeFormat;
 
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
@@ -22,6 +23,9 @@ export class User {
 
   @Column({ length: 256 })
   password: string;
+
+  @CreateDateColumn()
+  createdAt?: Date;
 
   @BeforeInsert()
   async hashPassword() {

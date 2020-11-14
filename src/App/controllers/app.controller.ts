@@ -1,20 +1,22 @@
 import {
   Controller,
   Request,
+  Response,
   Post,
+  Patch,
   UseGuards,
   Get,
 } from '@nestjs/common';
+import { User } from '../../users/entities/user.entity';
 import { AuthService } from '../../auth/auth.service';
 import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { UsersService } from '../../users/services/users.service';
 
+
 @Controller()
 export class AppController {
-  getHello(): any {
-    throw new Error('Method not implemented.');
-  }
+
   constructor(
       private readonly authService: AuthService,
       private readonly usersService: UsersService,
@@ -28,35 +30,34 @@ export class AppController {
   @UseGuards(LocalAuthGuard)
   @Post('auth/login')
   async login(@Request() req) {
-    console.log(req.user)
     return this.authService.login(req.user);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
-    return req.user;
+    const id  = req.id;
+    return this.usersService.findOneById(id)
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('/profile/mutation/email')
+  @Patch('/profile/email')
   changeEmail(@Request() req) {
     const {body, user} = req;
     return this.usersService.changeEmail(body.email, user);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('/profile/mutation/password')
+  @Patch('/profile/password')
   changePassword(@Request() req) {
     const {body, user} = req;
     return this.usersService.changePassword(body.password, user);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('/profile/mutation/name')
+  @Patch('/profile/name')
   changeName(@Request() req) {
     const {body, user} = req;
-
     return this.usersService.changeName(body.full_name, user);
   }
 }
