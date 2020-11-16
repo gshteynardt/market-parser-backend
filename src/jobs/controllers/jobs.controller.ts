@@ -18,7 +18,7 @@ export class JobsController {
   @UseGuards(JwtAuthGuard)
   @Post('/create')
   addJob(@Request() req) {
-    return this.jobsService.addJob(req.user.email, req.body.title);
+    return this.jobsService.addJob(req.user.id, req.body.title);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -31,38 +31,38 @@ export class JobsController {
   @UseGuards(JwtAuthGuard)
   @Post('/:id/get/data')
   async getData(@Param() params, @Request() req) {
-    return await this.jobsService.getJobData(params.id, req.user.email)
+    return await this.jobsService.getJobData(params.id, req.user.id)
   }
 
 
   @UseGuards(JwtAuthGuard)
   @Get('/all')
   async getAllJobs(@Request() req) {
-    return await this.jobsService.getAllJobs(req.user.email);
+    return await this.jobsService.getAllJobs(req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('/:id/stop')
   async stopJob(@Param() params, @Request() req) {
-    return this.jobsService.stopJob(parseInt(params.id), req.user.email);
+    return this.jobsService.stopJob(parseInt(params.id), req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('/:id/start')
   async startJob(@Param() params, @Request() req) {
-    return this.jobsService.startJob(parseInt(params.id), req.user.email);
+    return this.jobsService.startJob(parseInt(params.id), req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('/:id/status')
   getJobStatus(@Param() params, @Request() req) {
-    return this.jobsService.getJobStatus(parseInt(params.id), req.user.email);
+    return this.jobsService.getJobStatus(parseInt(params.id), req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('/:id/result/new')
   getJob(@Param() params, @Request() req) {
-    return this.jobsService.getJobResult(params.id, req.user.email);
+    return this.jobsService.getJobResult(params.id, req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)

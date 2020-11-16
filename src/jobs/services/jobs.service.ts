@@ -30,9 +30,9 @@ export class JobsService {
     private coreApiService: coreApiService,
   ) {}
 
-  async compareUserJob(email, jobId) {
-    const currentUser = await this.userService.findOne(email);
-    if (email) {
+  async compareUserJob(id: number, jobId) {
+    const currentUser = await this.userService.findOneById(id);
+    if (id) {
       const job: Job = await this.jobsRepository.findOne({
         author: currentUser,
         id: jobId,
@@ -51,8 +51,8 @@ export class JobsService {
       );
   }
 
-  async addJob(email: string, title: string) {
-    const user = await this.userService.findOne(email);
+  async addJob(id: number, title: string) {
+    const user = await this.userService.findOneById(id);
     if (user) {
       const job = this.jobsRepository.create({
         author: user,
@@ -76,13 +76,13 @@ export class JobsService {
       );
   }
 
-  async stopJob(id: number, email: string){
-    const job: Job = await this.compareUserJob(email, id);
+  async stopJob(id: number, idUser: number){
+    const job: Job = await this.compareUserJob(idUser, id);
     this.coreApiService.stopJob(job.jobUUID)
   }
 
-  async startJob(id: number, email: string){
-    const job: Job = await this.compareUserJob(email, id);
+  async startJob(id: number, idUser: number){
+    const job: Job = await this.compareUserJob(idUser, id);
     this.coreApiService.startJob(job.jobUUID)
   }
 
@@ -92,7 +92,7 @@ export class JobsService {
     // временная джоба
     // const jobID = '1604501042728_0x7954176052416189';
     fs.writeFile(`./data/import_${jobID}.xlsx`, file.buffer, () => {});
-    const job: Job|boolean = await this.compareUserJob(user.email, id);
+    const job: Job|boolean = await this.compareUserJob(user.id, id);
 
     if (job){
       job.jobUUID = jobID;
@@ -103,8 +103,8 @@ export class JobsService {
     .then(res=>res)
   }
 
-  async getJobData(id: number, email: string) {
-    const job: Job = await this.compareUserJob(email, id);
+  async getJobData(id: number, idUser: number) {
+    const job: Job = await this.compareUserJob(idUser, id);
     let fileData: string;
     try {
       fileData = fs.readFileSync(`./data/import_${job.jobUUID}.xlsx`, 'utf8');
@@ -115,14 +115,14 @@ export class JobsService {
   }
 
 
-  async getJobStatus(id: number, email: string) {
+  async getJobStatus(id: number, idUser: number) {
     const {
       createdAt,
       id: jobId,
       jobUUID,
       title,
       totalRows
-    }: Job = await this.compareUserJob(email, id);
+    }: Job = await this.compareUserJob(idUser, id);
     if (jobUUID) {
       return this.coreApiService.getStatus(jobUUID).pipe(
         map(({ data }) => {
@@ -146,8 +146,8 @@ export class JobsService {
       };
   }
 
-  async getJobResult(id: number, email: string) {
-    const job: Job = await this.compareUserJob(email, id);
+  async getJobResult(id: number, idUser: number) {
+    const job: Job = await this.compareUserJob(idUser, id);
     return this.coreApiService
       .getStatus(job.jobUUID)
       .toPromise()
@@ -163,8 +163,8 @@ export class JobsService {
       });
   }
 
-  async getOldJobResult(id: number, email: string) {
-    const job: Job = await this.compareUserJob(email, id);
+  async getOldJobResult(id: number, idUser: number) {
+    const job: Job = await this.compareUserJob(idUser, id);
     let fileData: string;
     try {
       fileData = fs.readFileSync(`./data/${job.jobUUID}.csv`, 'utf8');
@@ -187,8 +187,8 @@ export class JobsService {
     return { data: fileData, type: "In progress" };
   }
 
-  async deleteJob(id: number, email: string) {
-    const job: Job = await this.compareUserJob(email, id);
+  async deleteJob(id: number, idUser: number) {
+    const job: Job = await this.compareUserJob(idUser, id);
     if (job) {
       await this.jobsRepository
         .delete(job)
@@ -197,8 +197,8 @@ export class JobsService {
     } else return { message: 'Job not found' };
   }
 
-  async getAllJobs(email: string) {
-    const currentUser: User = await this.userService.findOne(email);
+  async getAllJobs(idUser: number) {
+    const currentUser: User = await this.userService.findOneById(idUser);
     const jobsArray: Job[] = await this.jobsRepository.find({
       author: currentUser,
     });

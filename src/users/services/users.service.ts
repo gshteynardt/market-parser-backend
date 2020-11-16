@@ -42,12 +42,7 @@ export class UsersService {
   async findOneById(id: number) {
     try {
       const queryUser: User = await this.usersRepository.findOneOrFail(id);
-      const userData: {id: number, email: string, full_name: string} = {
-        id: queryUser.id,
-        email: queryUser.email,
-        full_name: queryUser.full_name
-      }
-      return userData;
+      return queryUser;
     } catch (err) {
       throw new HttpException({message: 'User not found'}, HttpStatus.BAD_REQUEST);
     }
